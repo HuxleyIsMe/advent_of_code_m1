@@ -34,33 +34,6 @@ const findLargestCorner = (target) => {
     return odd
 }
 
-// const distanceFromCorner = ( details, target) => {
-
-//     console.log({details})
-
-
-//     let corner = details.total
-  
-
-//     while (corner > target) {
-//         corner -= details.maxSteps
-//     }
-
-//     let distance = target - corner 
-
-
-
-//     // this bit is off? 
-//     let steps = distance > details.midLength ? Math.abs(details.midLength - distance) :  distance
-
-//     let totalSteps = details.maxSteps - steps
-
-
-//     console.log({target, totalSteps})
-//     return totalSteps
-
-// }
-
 
  const distanceFromCorner = (details, target) => {
     const { total, maxSteps, midPoint } = details;
@@ -68,7 +41,6 @@ const findLargestCorner = (target) => {
     let corner = total;
     const midpoints = [];
 
-    // Find the midpoint of each side, counting backward
     for (let i = 0; i < 4; i++) {
         let midpoint = corner - maxSteps * i - midPoint;
         midpoints.push(midpoint);
@@ -76,8 +48,7 @@ const findLargestCorner = (target) => {
 
     // Find the closest midpoint to the target
     let offset = Math.min(...midpoints.map(mid => Math.abs(target - mid)));
-
-    // Manhattan distance = ring number (midPoint) + offset to closest axis
+    
     let totalSteps = midPoint + offset;
 
     console.log({ target, totalSteps });
