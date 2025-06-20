@@ -1,157 +1,201 @@
-class Node {
 
-    constructor(val, index){
-        this.index = index
-        this.value = val
-        this.next = undefined
+
+class Person {
+  constructor(wealth, index) {
+    this.index = index;
+    this.wealth = wealth;
+    this.next = null;
+    this.previous = null;
+    this.nextHelpfulNeighbor = this.next
+    this.previousHelpfulNeighbor = this.previous
+  }
+
+  helpNeighbor() {
+    if(this.wealth > 0 ) {
+      this.wealth -=1
+      return 1
+    }
+    return 0
+  }
+
+  iNeedHelp(){
+
+    if(!this.nextHelpfulNeighbor || !this.previousHelpfulNeighbor) {
+      this.nextHelpfulNeighbor = this.next
+      this.previousHelpfulNeighbor = this.previous
     }
 
-    incrementValue(val = 1){
-        this.value += val
+
+    let collection = this.nextHelpfulNeighbor.helpNeighbor() + this.previousHelpfulNeighbor.helpNeighbor()
+
+    if(!this.nextHelpfulNeighbor.value) {
+      this.nextHelpfulNeighbor = this.nextHelpfulNeighbor.next
     }
 
-    clearValue() {
-        this.value = 0
+    if(!this.previousHelpfulNeighbor.value) {
+      this.previousHelpfulNeighbor = this.previousHelpfulNeighbor.previous
     }
 
+    this.wealth += collection
+  }
 
+  decrementWealth(amount) {
+    this.wealth -= amount
+    while(this.wealth < 0) {
+      this.iNeedHelp()
+    }
+    this.nextHelpfulNeighbor = this.next
+    this.previousHelpfulNeighbor = this.previous
+  }
+
+
+  incrementWealth(amount = 1) {
+    this.wealth += amount;
+  }
+
+  shareWealth() {
+    const total = this.wealth;
+    this.wealth = 0;
+    return total;
+  }
 }
 
-class List {
+class Socialism {
+  constructor() {
+    this.head = null;
+    this.tail = null;
+    this.currentWealthiest = null;
+    this.mode = 'FIND_WEALTH';
+  }
 
-    constructor() {
-        this.head = undefined;
-        this.tail = undefined;
-        this.currentMaxNode = undefined;
-        this.currentMax = undefined;
-        this.patternsLib = {}
+  addHead(head) {
+    this.head = head;
+    this.currentWealthiest = head;
+  }
 
-   
+  addNode(node) {
+    let curr = this.head;
+    while (curr.next) {
+      curr.next.previous = curr
+      curr = curr.next;
+    }
+    node.previous = curr
+    curr.next = node;
+    this.tail = node;
+  }
 
+  joinCircular() {
+    if (this.tail && this.head) {
+      this.tail.next = this.head;
+      this.head.previous = this.tail
+    }
+  }
+
+  isWealthier(a, b) {
+    return a.wealth > b.wealth || (a.wealth === b.wealth && a.index < b.index);
+  }
+
+  /** I should refactor this but i was having a mo of i want a continual one looop situations  */
+  // run() {
+  //   const seen = {};
+  //   let wealthDistribution = [];
+  //   let toShare = 0;
+  //   let curr = this.currentWealthiest;
+  //   let candidate = this.currentWealthiest;
+  //   let cycles = 0;
+
+  //   while (curr) {
+  //     if (this.mode === 'FIND_WEALTH') {
+  //       wealthDistribution[curr.index] = curr.wealth;
+
+  //       if (this.isWealthier(curr, candidate)) {
+  //         candidate = curr;
+  //       }
+
+  //       if (curr.next === this.currentWealthiest) {
+  //         const key = wealthDistribution.join('');
+  //         if (seen[key]) {
+  //           console.log('Redistribution cycle detected!', cycles - seen[key]);
+  //           this.printLoop();
+  //           break;
+  //         } else {
+  //           seen[key] = cycles;
+  //           wealthDistribution = [];
+  //         }
+
+  //         this.mode = 'SHARE';
+  //         curr = candidate.next;
+  //         toShare = candidate.shareWealth();
+  //         candidate = { wealth: 0, index: Infinity };
+  //         cycles++;
+  //         continue;
+  //       }
+
+  //       curr = curr.next;
+  //     } else {
+  //       if (toShare === 0) {
+  //         this.mode = 'FIND_WEALTH';
+  //         this.currentWealthiest = curr;
+  //         continue;
+  //       }
+
+  //       curr.incrementWealth();
+  //       toShare--;
+  //       curr = curr.next;
+  //     }
+  //   }
+  // }
+
+  printLoop() {
+    let curr = this.head;
+    const seen = new Set();
+    const output = [];
+
+    while (curr && !seen.has(curr)) {
+      output.push(curr.wealth);
+      seen.add(curr);
+      curr = curr.next;
     }
 
-    addHead(head) {
-        this.head = head
-        this.currentMaxNode = head
-    }
-
-    addNode(node){
-        let curr = this.head
-        while(curr) {
-            let next = curr.next
-            if(!next) {
-                this.tail = node
-                curr.next = node
-                break
-            }
-            curr = next
-        }
-    }
-
-    joinMeTails() {
-        this.tail.next = this.head
-    }
-
-    seek(){
-      
-        let building = []
-    }
-
-    run(){
-        let toShare = 0;
-        let curr = this.currentMaxNode;
-        let candidate = this.currentMaxNode;
-        let cycles = 0
-      
-
-        while(curr) {
-        
-
-            if(this.mode === 'SEEK') {
-                building[curr.index] = (curr.value)
-               
-            
-                if(curr.value > candidate.value || (curr.value === candidate.value && curr.index < candidate.index)) {
-                    candidate = curr
-                } 
-
-                let next = curr.next
-
-        
-                if(next === this.currentMaxNode) {
-                   
-                    let result = building.join('');
-                    if(seenPatterns[result]) {
-                        console.log('we found it!', seenPatterns[result] - cycles)
-                        this.printMaBebes()
-                        break;
-                    } else {
-                        seenPatterns[result] = cycles
-                        building =[]
-                    }
-                    // change our mode
-                    this.mode = "GIVE"
-                    // take the new candidates value 
-                    toShare = candidate.value
-                    // next loop should run from this one
-                    curr = candidate.next
-                    // we need to clear the candidate
-                    candidate.clearValue();  
-                    cycles++ 
-                    
-                    candidate = {value : 0, index: Infinity}
-                   
-                    continue
-                }
-                curr = next
-            } else {
-                if(toShare === 0) {
-                    this.mode = 'SEEK'
-                    this.currentMaxNode = curr
-                    continue
-                }
-                
-                // giving out
-                curr.incrementValue()
-                toShare--
-                curr = curr.next
-
-            }
-        }
-    }
-
-    printMaBebes() {
-        let curr = this.head
-        while(curr) {
-            console.log(curr.value)
-            let next = curr.next
-
-              if(next === this.head) {
-                console.log('we looped')
-                break
-              }
-            curr = next
-        }
-    }
+    console.log(output.join(' -> '));
+    console.log('Updated');
+  }
 }
 
+// === INIT ===
 
-let list = [14,0,15,12,11,11,3,5,1,6,8,4,9,1,8,4]
-// let list = [0,2,7,0]
+const initialWealth = [14, 0, 15, 12, 11, 11, 3, 5, 1, 6, 8, 4, 9, 1, 8, 4];
+const Community = new Socialism();
+
+const people = initialWealth.map((wealth, index) => new Person(wealth, index));
+Community.addHead(people.shift());
+people.forEach(person => Community.addNode(person));
+Community.joinCircular();
+// console.log(Community.head)
+
+console.log('before')
+Community.printLoop()
+// let testNode = people[6]
+// testNode.decrementWealth(10)
+// console.log('\n after \n') 
+// Community.printLoop()
 
 
-const Reli = new List()
+setInterval(() => {
+  let target = people[Math.floor((Math.random() * people.length))]
+  let val = Math.floor(Math.random() * 5)
 
+  let luck = Math.random()
 
-const nodes = list.map((val, index) => new Node(val, index))
+  if(luck > 0.5) {
+    console.log('good luck', target.index, val)
+    target.incrementWealth(val)
+  } else {
+    console.log('bad luck',target.index, val)
+    target.decrementWealth(val)
+  }
 
-Reli.addHead(nodes.shift())
+  Community.printLoop()
+}, 5000)
 
-nodes.forEach(val => Reli.addNode(val))
-
-
-Reli.joinMeTails()
-
-
-Reli.run()
-
+// Community.run();
