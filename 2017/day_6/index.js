@@ -1,5 +1,7 @@
 
 
+const TYPES = ['CAPITALIST', 'SOCIALIST', 'ANARCHIST', 'COMMUNIST']
+
 class Person {
   constructor(wealth, index) {
     this.index = index;
